@@ -1,0 +1,3 @@
+[submodule "submodules/FixedPoint"]
+	path = submodules/FixedPoint
+	url = https://github.com/Galfurian/FixedPoint.git
