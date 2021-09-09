@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "fpnn/fixed_point_matrix.hpp"
 #include "fpnn/matrix_utility.hpp"
+#include "fpnn/matrix.hpp"
 #include "fixedPoint.hpp"
 
 template <typename MatrixType>
