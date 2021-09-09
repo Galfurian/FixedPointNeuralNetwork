@@ -89,12 +89,14 @@ void test_op()
         auto sum = m1 + m2;
         auto sub = m1 - m2;
         auto mul = m1 * m2;
+        auto div = m1 / m2;
 
         dump(m1);
         dump(m2);
         dump(sum);
         dump(sub);
         dump(mul);
+        dump(div);
     }
     std::cout << std::string(40, '=') << "\n";
 }

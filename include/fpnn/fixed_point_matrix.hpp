@@ -27,7 +27,7 @@ public:
     Matrix(const initializer_list_type_t &values);
 
     /// @brief Construct a new Matrix object.
-    /// @param rhs
+    /// @param rhs the other matrix.
     Matrix(const Matrix<T> &rhs);
 
     /// @brief Destroy the Matrix object.
@@ -59,58 +59,88 @@ public:
     /// @return a reference to this matrix.
     Matrix<T> &operator=(const Matrix<T> &rhs);
 
-    /// @brief
-    /// @param rhs
-    /// @return
+    /// @brief Addition of two matrices.
+    /// @param rhs the other matrix.
+    /// @return the result of the operation.
     Matrix<T> operator+(const Matrix<T> &rhs);
 
-    /// @brief
-    /// @param rhs
+    /// @brief Cumulative addition of this matrix and another.
+    /// @param rhs the other matrix.
     /// @return a reference to this matrix.
     Matrix<T> &operator+=(const Matrix<T> &rhs);
 
-    /// @brief
-    /// @param rhs
-    /// @return
+    /// @brief Subtraction of this matrix and another.
+    /// @param rhs the other matrix.
+    /// @return the result of the operation.
     Matrix<T> operator-(const Matrix<T> &rhs);
 
-    /// @brief
-    /// @param rhs
+    /// @brief Cumulative subtraction of this matrix and another.
+    /// @param rhs the other matrix.
     /// @return a reference to this matrix.
     Matrix<T> &operator-=(const Matrix<T> &rhs);
 
-    /// @brief
-    /// @param rhs
-    /// @return
+    /// @brief Left multiplication of this matrix and another.
+    /// @param rhs the other matrix.
+    /// @return the result of the operation.
     Matrix<T> operator*(const Matrix<T> &rhs);
 
-    /// @brief
-    /// @param rhs
+    /// @brief Cumulative left multiplication of this matrix and another.
+    /// @param rhs the other matrix.
     /// @return a reference to this matrix.
     Matrix<T> &operator*=(const Matrix<T> &rhs);
 
-    /// @brief
-    /// @param rhs
-    /// @return
+    /// @brief Right division of this matrix and another.
+    /// @param rhs the other matrix.
+    /// @return the result of the operation.
+    Matrix<T> operator/(const Matrix<T> &rhs);
+
+    /// @brief Cumulative right division of this matrix and another.
+    /// @param rhs the other matrix.
+    /// @return a reference to this matrix.
+    Matrix<T> &operator/=(const Matrix<T> &rhs);
+
+    /// @brief Matrix/scalar addition.
+    /// @param rhs the other matrix.
+    /// @return the result of the operation.
     Matrix<T> operator+(const T &rhs);
 
-    /// @brief
-    /// @param rhs
-    /// @return
+    /// @brief Cumulative matrix/scalar addition.
+    /// @param rhs the other matrix.
+    /// @return the result of the operation.
+    Matrix<T> &operator+=(const T &rhs);
+
+    /// @brief Matrix/scalar subtraction.
+    /// @param rhs the other matrix.
+    /// @return the result of the operation.
     Matrix<T> operator-(const T &rhs);
 
-    /// @brief
-    /// @param rhs
-    /// @return
+    /// @brief Cumulative matrix/scalar subtraction.
+    /// @param rhs the other matrix.
+    /// @return the result of the operation.
+    Matrix<T> &operator-=(const T &rhs);
+
+    /// @brief Matrix/scalar multiplication.
+    /// @param rhs the other matrix.
+    /// @return the result of the operation.
     Matrix<T> operator*(const T &rhs);
 
-    /// @brief
-    /// @param rhs
-    /// @return
+    /// @brief Cumulative matrix/scalar multiplication.
+    /// @param rhs the other matrix.
+    /// @return the result of the operation.
+    Matrix<T> &operator*=(const T &rhs);
+
+    /// @brief Matrix/scalar division.
+    /// @param rhs the other matrix.
+    /// @return the result of the operation.
     Matrix<T> operator/(const T &rhs);
 
-    /// @brief
-    /// @param rhs
+    /// @brief Cumulative matrix/scalar division.
+    /// @param rhs the other matrix.
+    /// @return the result of the operation.
+    Matrix<T> &operator/=(const T &rhs);
+
+    /// @brief Multiply a matrix with a vector.
+    /// @param rhs the other matrix.
     /// @return
     std::vector<T> operator*(const std::vector<T> &rhs);
 
@@ -242,7 +272,6 @@ Matrix<T> &Matrix<T>::operator=(const Matrix<T> &rhs)
     return *this;
 }
 
-// Addition of two matrices
 template <typename T>
 Matrix<T> Matrix<T>::operator+(const Matrix<T> &rhs)
 {
@@ -282,46 +311,12 @@ Matrix<T> Matrix<T>::operator+(const Matrix<T> &rhs)
     assert(false && "Arrays have incompatible sizes for this operation.");
 }
 
-// Cumulative addition of this matrix and another
 template <typename T>
 Matrix<T> &Matrix<T>::operator+=(const Matrix<T> &rhs)
 {
-    unsigned rows = rhs.get_rows(), cols = rhs.get_cols();
-    bool lhs_is_cell = ((_rows == 1) && (_cols == 1)),
-         rhs_is_cell = ((rows == 1) && (cols == 1));
-    bool lhs_is_vect = ((_rows == 1) || (_cols == 1)) && !lhs_is_cell,
-         rhs_is_vect = ((rows == 1) || (cols == 1)) && !rhs_is_cell;
-    if (lhs_is_cell || rhs_is_cell) {
-        // Prepare the result.
-        Matrix tmp(rhs_is_cell ? _rows : rows, rhs_is_cell ? _cols : cols, 0.0);
-        // Prepare the references to the right matrices.
-        const Matrix<T> &_matrix = rhs_is_cell ? *this : rhs, _cell = rhs_is_cell ? rhs : *this;
-        // Compute the sum.
-        for (size_t i = 0; i < (rhs_is_cell ? this->get_size() : rhs.get_size()); ++i)
-            tmp._data[i] = _matrix._data[i] + _cell._data[0];
-        return (*this = tmp);
-    } else if (lhs_is_vect || rhs_is_vect) {
-        // Prepare the tmp.
-        Matrix tmp(rhs_is_vect ? _rows : rows, rhs_is_vect ? _cols : cols, 0.0);
-        // Prepare the references to the right matrices.
-        const Matrix<T> &_matrix = rhs_is_vect ? *this : rhs, _vect = rhs_is_vect ? rhs : *this;
-        // Compute the selector.
-        bool is_row_vect = (_vect._rows == 1);
-        // Compute the sum.
-        for (unsigned i = 0; i < (rhs_is_vect ? _rows : rows); i++)
-            for (unsigned j = 0; j < (rhs_is_vect ? _cols : cols); j++)
-                tmp(i, j) = _matrix(i, j) + _vect(i * !is_row_vect, j * is_row_vect);
-        return (*this = tmp);
-    } else if ((_rows == rows) && (_cols == cols)) {
-        for (unsigned i = 0; i < _rows; i++)
-            for (unsigned j = 0; j < _cols; j++)
-                this->at(i, j) += rhs(i, j);
-        return *this;
-    }
-    assert(false && "Arrays have incompatible sizes for this operation.");
+    return ((*this) = this->operator+(rhs));
 }
 
-// Subtraction of this matrix and another
 template <typename T>
 Matrix<T> Matrix<T>::operator-(const Matrix<T> &rhs)
 {
@@ -361,46 +356,12 @@ Matrix<T> Matrix<T>::operator-(const Matrix<T> &rhs)
     assert(false && "Arrays have incompatible sizes for this operation.");
 }
 
-// Cumulative subtraction of this matrix and another
 template <typename T>
 Matrix<T> &Matrix<T>::operator-=(const Matrix<T> &rhs)
 {
-    unsigned rows = rhs.get_rows(), cols = rhs.get_cols();
-    bool lhs_is_cell = ((_rows == 1) && (_cols == 1)),
-         rhs_is_cell = ((rows == 1) && (cols == 1));
-    bool lhs_is_vect = ((_rows == 1) || (_cols == 1)) && !lhs_is_cell,
-         rhs_is_vect = ((rows == 1) || (cols == 1)) && !rhs_is_cell;
-    if (lhs_is_cell || rhs_is_cell) {
-        // Prepare the result.
-        Matrix tmp(rhs_is_cell ? _rows : rows, rhs_is_cell ? _cols : cols, 0.0);
-        // Prepare the references to the right matrices.
-        const Matrix<T> &_matrix = rhs_is_cell ? *this : rhs, _cell = rhs_is_cell ? rhs : *this;
-        // Compute the sum.
-        for (size_t i = 0; i < (rhs_is_cell ? this->get_size() : rhs.get_size()); ++i)
-            tmp._data[i] = _matrix._data[i] - _cell._data[0];
-        return (*this = tmp);
-    } else if (lhs_is_vect || rhs_is_vect) {
-        // Prepare the tmp.
-        Matrix tmp(rhs_is_vect ? _rows : rows, rhs_is_vect ? _cols : cols, 0.0);
-        // Prepare the references to the right matrices.
-        const Matrix<T> &_matrix = rhs_is_vect ? *this : rhs, _vect = rhs_is_vect ? rhs : *this;
-        // Compute the selector.
-        bool is_row_vect = (_vect._rows == 1);
-        // Compute the sum.
-        for (unsigned i = 0; i < (rhs_is_vect ? _rows : rows); i++)
-            for (unsigned j = 0; j < (rhs_is_vect ? _cols : cols); j++)
-                tmp(i, j) = _matrix(i, j) - _vect(i * !is_row_vect, j * is_row_vect);
-        return (*this = tmp);
-    } else if ((_rows == rows) && (_cols == cols)) {
-        for (unsigned i = 0; i < _rows; i++)
-            for (unsigned j = 0; j < _cols; j++)
-                this->at(i, j) -= rhs(i, j);
-        return *this;
-    }
-    assert(false && "Arrays have incompatible sizes for this operation.");
+    return ((*this) = this->operator-(rhs));
 }
 
-// Left multiplication of this matrix and another
 template <typename T>
 Matrix<T> Matrix<T>::operator*(const Matrix<T> &rhs)
 {
@@ -418,13 +379,22 @@ Matrix<T> Matrix<T>::operator*(const Matrix<T> &rhs)
     return result;
 }
 
-// Cumulative left multiplication of this matrix and another
 template <typename T>
 Matrix<T> &Matrix<T>::operator*=(const Matrix<T> &rhs)
 {
-    Matrix result = (*this) * rhs;
-    (*this)         = result;
-    return *this;
+    return ((*this) = this->operator*(rhs));
+}
+
+template <typename T>
+Matrix<T> Matrix<T>::operator/(const Matrix<T> &rhs)
+{
+    return this->operator*(rhs.inverse());
+}
+
+template <typename T>
+Matrix<T> &Matrix<T>::operator/=(const Matrix<T> &rhs)
+{
+    return ((*this) = this->operator*(rhs.inverse()));
 }
 
 template <typename T>
@@ -437,82 +407,92 @@ Matrix<T> Matrix<T>::transpose() const
     return result;
 }
 
-// Matrix/scalar addition
 template <typename T>
 Matrix<T> Matrix<T>::operator+(const T &rhs)
 {
     Matrix result(_rows, _cols, 0.0);
-
-    for (unsigned i = 0; i < _rows; i++) {
-        for (unsigned j = 0; j < _cols; j++) {
+    for (unsigned i = 0; i < _rows; i++)
+        for (unsigned j = 0; j < _cols; j++)
             result(i, j) = this->at(i, j) + rhs;
-        }
-    }
-
     return result;
 }
 
-// Matrix/scalar subtraction
+template <typename T>
+Matrix<T>& Matrix<T>::operator+=(const T &rhs)
+{
+    for (unsigned i = 0; i < _rows; i++)
+        for (unsigned j = 0; j < _cols; j++)
+            this->at(i, j) += rhs;
+    return *this;
+}
+
 template <typename T>
 Matrix<T> Matrix<T>::operator-(const T &rhs)
 {
     Matrix result(_rows, _cols, 0.0);
-
-    for (unsigned i = 0; i < _rows; i++) {
-        for (unsigned j = 0; j < _cols; j++) {
+    for (unsigned i = 0; i < _rows; i++)
+        for (unsigned j = 0; j < _cols; j++)
             result(i, j) = this->at(i, j) - rhs;
-        }
-    }
-
     return result;
 }
 
-// Matrix/scalar multiplication
+template <typename T>
+Matrix<T>& Matrix<T>::operator-=(const T &rhs)
+{
+    for (unsigned i = 0; i < _rows; i++)
+        for (unsigned j = 0; j < _cols; j++)
+            this->at(i, j) -= rhs;
+    return *this;
+}
+
 template <typename T>
 Matrix<T> Matrix<T>::operator*(const T &rhs)
 {
     Matrix result(_rows, _cols, 0.0);
-
-    for (unsigned i = 0; i < _rows; i++) {
-        for (unsigned j = 0; j < _cols; j++) {
+    for (unsigned i = 0; i < _rows; i++)
+        for (unsigned j = 0; j < _cols; j++)
             result(i, j) = this->at(i, j) * rhs;
-        }
-    }
-
     return result;
 }
 
-// Matrix/scalar division
+template <typename T>
+Matrix<T>& Matrix<T>::operator*=(const T &rhs)
+{
+    for (unsigned i = 0; i < _rows; i++)
+        for (unsigned j = 0; j < _cols; j++)
+            this->at(i, j) *= rhs;
+    return *this;
+}
+
 template <typename T>
 Matrix<T> Matrix<T>::operator/(const T &rhs)
 {
     Matrix result(_rows, _cols, 0.0);
-
-    for (unsigned i = 0; i < _rows; i++) {
-        for (unsigned j = 0; j < _cols; j++) {
+    for (unsigned i = 0; i < _rows; i++)
+        for (unsigned j = 0; j < _cols; j++)
             result(i, j) = this->at(i, j) / rhs;
-        }
-    }
-
     return result;
 }
 
-// Multiply a matrix with a vector
+template <typename T>
+Matrix<T>& Matrix<T>::operator/=(const T &rhs)
+{
+    for (unsigned i = 0; i < _rows; i++)
+        for (unsigned j = 0; j < _cols; j++)
+            this->at(i, j) /= rhs;
+    return *this;
+}
+
 template <typename T>
 std::vector<T> Matrix<T>::operator*(const std::vector<T> &rhs)
 {
     std::vector<T> result(rhs.size(), 0.0);
-
-    for (unsigned i = 0; i < _rows; i++) {
-        for (unsigned j = 0; j < _cols; j++) {
+    for (unsigned i = 0; i < _rows; i++)
+        for (unsigned j = 0; j < _cols; j++)
             result[i] = this->at(i, j) * rhs[j];
-        }
-    }
-
     return result;
 }
 
-// Obtain a vector of the diagonal elements
 template <typename T>
 std::vector<T> Matrix<T>::diag() const
 {
@@ -522,14 +502,12 @@ std::vector<T> Matrix<T>::diag() const
     return result;
 }
 
-// Access the individual elements
 template <typename T>
 T &Matrix<T>::operator()(const unsigned &row, const unsigned &col)
 {
     return _data[(row * _cols) + col];
 }
 
-// Access the individual elements (const)
 template <typename T>
 const T &Matrix<T>::operator()(const unsigned &row, const unsigned &col) const
 {
